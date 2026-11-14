@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('My orders')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="wrap">
+  <h1>My orders</h1>
+  <div th:replace="~{fragments :: flash}"></div>
+  <div th:if="${orders.isEmpty()}" class="panel">
+    <p>You haven't ordered anything yet.</p>
+    <a class="btn" th:href="@{/menu}">Browse the menu</a>
+  </div>
+  <div class="scroll" th:unless="${orders.isEmpty()}"><table>
+    <tr><th>Token</th><th>Placed</th><th>Pickup</th><th>Status</th><th class="num">Total</th><th></th></tr>
+    <tr th:each="o : ${orders}">
+      <td><b th:text="${o.token_code}">T-001</b></td>
+      <td th:text="${o.placed_at}">date</td>
+      <td th:text="${o.pickup}">12:00</td>
+      <td><span class="status" th:classappend="${o.status}" th:text="${o.status.toLowerCase()}">placed</span></td>
+      <td class="num" th:text="'₹' + ${#numbers.formatDecimal(o.total, 1, 2)}">₹0</td>
+      <td><a th:href="@{/order/{id}(id=${o.order_id})}">Track</a> | <a th:href="@{/bill/{id}(id=${o.order_id})}">Bill</a></td>
+    </tr>
+  </table></div>
+</main>
+</body>
+</html>

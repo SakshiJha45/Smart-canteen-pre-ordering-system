@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Dashboard')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="wrap">
+  <h1>Kitchen dashboard</h1>
+  <div th:replace="~{fragments :: flash}"></div>
+  <div class="stats">
+    <div class="stat"><b th:text="${stats.orders_today}">0</b>Orders today</div>
+    <div class="stat"><b th:text="'₹' + ${#numbers.formatDecimal(stats.revenue_today, 1, 2)}">₹0</b>Revenue today</div>
+    <div class="stat"><b th:text="${stats.active_orders}">0</b>Orders to prepare or collect</div>
+    <div class="stat" th:classappend="${stats.low_stock > 0} ? 'warn'"><b th:text="${stats.low_stock}">0</b>Items with 5 or less in stock</div>
+  </div>
+
+  <h2>Kitchen queue</h2>
+  <p th:if="${queue.isEmpty()}" class="muted">No active orders. New orders appear here.</p>
+  <div class="scroll" th:unless="${queue.isEmpty()}"><table>
+    <tr><th>Token</th><th>Customer</th><th>Pickup</th><th>Items</th><th>Status</th></tr>
+    <tr th:each="q : ${queue}">
+      <td><b th:text="${q.token_code}">T-001</b></td>
+      <td th:text="${q.customer}">Name</td>
+      <td th:text="${q.pickup}">12:00</td>
+      <td th:text="${q.items}">items</td>
+      <td><span class="status" th:classappend="${q.status}" th:text="${q.status.toLowerCase()}">placed</span></td>
+    </tr>
+  </table></div>
+  <p><a class="btn" th:href="@{/admin/orders}">Update order status</a></p>
+
+  <h2>Best sellers</h2>
+  <p th:if="${top.isEmpty()}" class="muted">Sales will show up after the first order.</p>
+  <div class="scroll" th:unless="${top.isEmpty()}"><table>
+    <tr><th>Item</th><th class="num">Sold</th><th class="num">Amount</th></tr>
+    <tr th:each="t : ${top}">
+      <td th:text="${t.emoji + ' ' + t.name}">Item</td>
+      <td class="num" th:text="${t.qty_sold}">0</td>
+      <td class="num" th:text="'₹' + ${#numbers.formatDecimal(t.amount, 1, 2)}">₹0</td>
+    </tr>
+  </table></div>
+</main>
+</body>
+</html>

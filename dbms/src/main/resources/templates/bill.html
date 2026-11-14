@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Bill')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="wrap">
+  <div class="bill">
+    <h2>Smart Canteen</h2>
+    <p style="text-align:center;margin:0">Pre-order receipt</p>
+    <hr>
+    <div>Bill no: <b th:text="'INV-' + ${#numbers.formatInteger(order.order_id, 5)}">INV-00001</b></div>
+    <div>Date: <span th:text="${order.placed_at}">date</span></div>
+    <div>Customer: <span th:text="${order.customer}">Name</span></div>
+    <div>Token: <b th:text="${order.token_code}">T-001</b> &nbsp; Pickup: <span th:text="${order.pickup}">12:00</span></div>
+    <hr>
+    <table>
+      <tr><th>Item</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Amt</th></tr>
+      <tr th:each="i : ${items}">
+        <td th:text="${i.name}">Item</td>
+        <td class="num" th:text="${i.quantity}">1</td>
+        <td class="num" th:text="${#numbers.formatDecimal(i.unit_price, 1, 2)}">0</td>
+        <td class="num" th:text="${#numbers.formatDecimal(i.line_total, 1, 2)}">0</td>
+      </tr>
+    </table>
+    <hr>
+    <div class="totals" style="max-width:none">
+      <div><span>Subtotal</span><span th:text="'₹' + ${#numbers.formatDecimal(order.subtotal, 1, 2)}"></span></div>
+      <div><span th:text="'GST (' + ${gstPercent} + '%)'">GST</span><span th:text="'₹' + ${#numbers.formatDecimal(order.tax, 1, 2)}"></span></div>
+      <div class="grand"><span>Total</span><span th:text="'₹' + ${#numbers.formatDecimal(order.total, 1, 2)}"></span></div>
+    </div>
+    <hr>
+    <div>Paid by: <span th:text="${order.payment_mode}">UPI</span> - <b th:text="${order.pay_status}">PAID</b></div>
+    <div class="foot">
+      <p>Thank you! Please show your token at the counter.</p>
+      <p><b>Developed by Sakshi Jha</b></p>
+    </div>
+  </div>
+  <p class="noprint" style="text-align:center">
+    <button type="button" onclick="window.print()">Print bill</button>
+    <a class="btn alt" th:href="@{/order/{id}(id=${order.order_id})}">Back to order</a>
+  </p>
+</main>
+</body>
+</html>

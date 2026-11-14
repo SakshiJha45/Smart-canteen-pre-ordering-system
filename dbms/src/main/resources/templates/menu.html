@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Menu')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="wrap">
+  <h1>Today's menu</h1>
+  <div th:replace="~{fragments :: flash}"></div>
+  <div class="chips">
+    <a th:href="@{/menu}" th:classappend="${cat == null} ? 'on'">All</a>
+    <a th:each="c : ${categories}" th:href="@{/menu(cat=${c.category_id})}"
+       th:classappend="${cat != null and cat == c.category_id} ? 'on'" th:text="${c.name}">Snacks</a>
+  </div>
+  <div class="panel">
+    <p th:if="${items.isEmpty()}" class="muted">Nothing on the menu in this category yet.</p>
+    <div class="menu-row" th:each="i : ${items}" th:classappend="${i.stock == 0} ? 'soldout'">
+      <div class="emoji" th:text="${i.emoji}">🍛</div>
+      <div>
+        <h3 th:text="${i.name}">Item</h3>
+        <div class="muted" th:text="${i.description}">Description</div>
+        <div class="stock" th:classappend="${i.stock > 0 and i.stock <= 5} ? 'low'"
+             th:text="${i.stock == 0 ? 'Sold out' : i.stock + ' left'}">10 left</div>
+        <form th:if="${i.stock > 0}" method="post" th:action="@{/cart/add}">
+          <input type="hidden" name="itemId" th:value="${i.item_id}">
+          <input type="hidden" name="cat" th:value="${cat}" th:if="${cat != null}">
+          <input type="number" name="qty" value="1" min="1" th:max="${i.stock}" aria-label="Quantity">
+          <button class="small" type="submit">Add to cart</button>
+        </form>
+      </div>
+      <div class="price" th:text="'₹' + ${#numbers.formatDecimal(i.price, 1, 2)}">₹40.00</div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Checkout')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="wrap">
+  <h1>Pickup and payment</h1>
+  <div th:replace="~{fragments :: flash}"></div>
+  <form class="panel" method="post" th:action="@{/checkout}">
+    <label for="pickup">Pickup time</label>
+    <select id="pickup" name="pickup" required>
+      <option th:each="s : ${slots}" th:value="${s}" th:text="${s}">12:00</option>
+    </select>
+    <label>Payment mode</label>
+    <p>
+      <label style="font-weight:400"><input type="radio" name="mode" value="UPI" checked> UPI (paid now)</label>
+      <label style="font-weight:400"><input type="radio" name="mode" value="CARD"> Card (paid now)</label>
+      <label style="font-weight:400"><input type="radio" name="mode" value="CASH"> Cash (pay when you collect)</label>
+    </p>
+    <h2>Order summary</h2>
+    <ul>
+      <li th:each="l : ${lines}" th:text="${l.qty + ' x ' + l.name + ' - ₹' + #numbers.formatDecimal(l.line_total, 1, 2)}">1 x Item</li>
+    </ul>
+    <div class="totals">
+      <div><span>Subtotal</span><span th:text="'₹' + ${#numbers.formatDecimal(subtotal, 1, 2)}"></span></div>
+      <div><span th:text="'GST (' + ${gstPercent} + '%)'">GST</span><span th:text="'₹' + ${#numbers.formatDecimal(tax, 1, 2)}"></span></div>
+      <div class="grand"><span>Total</span><span th:text="'₹' + ${#numbers.formatDecimal(total, 1, 2)}"></span></div>
+    </div>
+    <p><button type="submit">Place order</button> <a class="btn alt" th:href="@{/cart}">Back to cart</a></p>
+  </form>
+</main>
+</body>
+</html>

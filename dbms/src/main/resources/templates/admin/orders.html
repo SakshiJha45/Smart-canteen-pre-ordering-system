@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Orders')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="wrap" style="max-width:1100px">
+  <h1>Orders</h1>
+  <div th:replace="~{fragments :: flash}"></div>
+  <p th:if="${orders.isEmpty()}" class="muted">No orders yet.</p>
+  <div class="scroll" th:unless="${orders.isEmpty()}"><table>
+    <tr><th>Token</th><th>Customer</th><th>Items</th><th>Pickup</th><th>Payment</th><th>Status</th><th>Action</th></tr>
+    <tr th:each="o : ${orders}">
+      <td><b th:text="${o.token_code}">T-001</b></td>
+      <td th:text="${o.customer}">Name</td>
+      <td th:text="${o.items}">items</td>
+      <td th:text="${o.pickup}">12:00</td>
+      <td th:text="${o.payment_mode + ' - ' + o.pay_status.toLowerCase()}">UPI - paid</td>
+      <td><span class="status" th:classappend="${o.status}" th:text="${o.status.toLowerCase()}">placed</span></td>
+      <td>
+        <form th:if="${o.status == 'PLACED'}" method="post" th:action="@{/admin/orders/status}">
+          <input type="hidden" name="orderId" th:value="${o.order_id}"><input type="hidden" name="status" value="PREPARING">
+          <button class="small" type="submit">Start preparing</button></form>
+        <form th:if="${o.status == 'PREPARING'}" method="post" th:action="@{/admin/orders/status}">
+          <input type="hidden" name="orderId" th:value="${o.order_id}"><input type="hidden" name="status" value="READY">
+          <button class="small" type="submit">Mark ready</button></form>
+        <form th:if="${o.status == 'READY'}" method="post" th:action="@{/admin/orders/status}">
+          <input type="hidden" name="orderId" th:value="${o.order_id}"><input type="hidden" name="status" value="COLLECTED">
+          <button class="small" type="submit">Mark collected</button></form>
+        <form th:if="${o.status == 'PLACED' or o.status == 'PREPARING'}" method="post" th:action="@{/admin/orders/status}">
+          <input type="hidden" name="orderId" th:value="${o.order_id}"><input type="hidden" name="status" value="CANCELLED">
+          <button class="small danger" type="submit">Cancel</button></form>
+        <a th:href="@{/bill/{id}(id=${o.order_id})}">Bill</a>
+      </td>
+    </tr>
+  </table></div>
+</main>
+</body>
+</html>

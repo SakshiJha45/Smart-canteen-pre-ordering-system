@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${title} + ' - Smart Canteen'">Smart Canteen</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<nav th:fragment="nav" class="nav">
+  <a class="brand" th:href="@{/}">Smart Canteen</a>
+  <div class="links">
+    <th:block th:if="${session.user.admin}">
+      <a th:href="@{/admin}">Dashboard</a>
+      <a th:href="@{/admin/orders}">Orders</a>
+      <a th:href="@{/admin/menu}">Menu</a>
+      <a th:href="@{/admin/sales}">Sales</a>
+    </th:block>
+    <th:block th:unless="${session.user.admin}">
+      <a th:href="@{/menu}">Menu</a>
+      <a th:href="@{/cart}">Cart<span class="badge" th:if="${session.cart != null and !session.cart.isEmpty()}" th:text="${session.cart.size()}">1</span></a>
+      <a th:href="@{/orders}">My orders</a>
+    </th:block>
+    <span th:text="${session.user.name}">Name</span>
+    <a th:href="@{/logout}">Log out</a>
+  </div>
+</nav>
+<div th:fragment="flash">
+  <p class="alert ok" th:if="${msg}" th:text="${msg}"></p>
+  <p class="alert err" th:if="${error}" th:text="${error}"></p>
+</div>
+</body>
+</html>

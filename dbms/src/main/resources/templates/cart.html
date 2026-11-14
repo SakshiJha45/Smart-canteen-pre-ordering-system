@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Cart')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="wrap">
+  <h1>Your cart</h1>
+  <div th:replace="~{fragments :: flash}"></div>
+  <div th:if="${lines.isEmpty()}" class="panel">
+    <p>Your cart is empty.</p>
+    <a class="btn" th:href="@{/menu}">Browse the menu</a>
+  </div>
+  <div th:unless="${lines.isEmpty()}">
+    <div class="scroll"><table>
+      <tr><th>Item</th><th class="num">Price</th><th>Quantity</th><th class="num">Total</th><th></th></tr>
+      <tr th:each="l : ${lines}">
+        <td th:text="${l.emoji + ' ' + l.name}">Item</td>
+        <td class="num" th:text="'₹' + ${#numbers.formatDecimal(l.price, 1, 2)}">₹0</td>
+        <td>
+          <form method="post" th:action="@{/cart/update}">
+            <input type="hidden" name="itemId" th:value="${l.item_id}">
+            <input type="number" name="qty" th:value="${l.qty}" min="0" th:max="${l.stock}" aria-label="Quantity">
+            <button class="small alt" type="submit">Update</button>
+          </form>
+        </td>
+        <td class="num" th:text="'₹' + ${#numbers.formatDecimal(l.line_total, 1, 2)}">₹0</td>
+        <td>
+          <form method="post" th:action="@{/cart/remove}">
+            <input type="hidden" name="itemId" th:value="${l.item_id}">
+            <button class="small danger" type="submit">Remove</button>
+          </form>
+        </td>
+      </tr>
+    </table></div>
+    <div class="totals">
+      <div><span>Subtotal</span><span th:text="'₹' + ${#numbers.formatDecimal(subtotal, 1, 2)}"></span></div>
+      <div><span th:text="'GST (' + ${gstPercent} + '%)'">GST</span><span th:text="'₹' + ${#numbers.formatDecimal(tax, 1, 2)}"></span></div>
+      <div class="grand"><span>Total</span><span th:text="'₹' + ${#numbers.formatDecimal(total, 1, 2)}"></span></div>
+      <p style="text-align:right"><a class="btn" th:href="@{/checkout}">Choose pickup time</a></p>
+    </div>
+  </div>
+</main>
+</body>
+</html>

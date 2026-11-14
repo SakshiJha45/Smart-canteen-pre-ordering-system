@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Sales report')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="wrap">
+  <h1>Sales report</h1>
+  <h2>Daily sales</h2>
+  <p th:if="${daily.isEmpty()}" class="muted">No sales yet.</p>
+  <div class="scroll" th:unless="${daily.isEmpty()}"><table>
+    <tr><th>Date</th><th class="num">Orders</th><th class="num">Subtotal</th><th class="num">GST</th><th class="num">Revenue</th></tr>
+    <tr th:each="d : ${daily}">
+      <td th:text="${d.sale_day}">date</td>
+      <td class="num" th:text="${d.total_orders}">0</td>
+      <td class="num" th:text="'₹' + ${#numbers.formatDecimal(d.subtotal, 1, 2)}">0</td>
+      <td class="num" th:text="'₹' + ${#numbers.formatDecimal(d.tax, 1, 2)}">0</td>
+      <td class="num"><b th:text="'₹' + ${#numbers.formatDecimal(d.revenue, 1, 2)}">0</b></td>
+    </tr>
+  </table></div>
+
+  <h2>Top 5 items</h2>
+  <p th:if="${top.isEmpty()}" class="muted">No items sold yet.</p>
+  <div class="scroll" th:unless="${top.isEmpty()}"><table>
+    <tr><th>Item</th><th class="num">Sold</th><th class="num">Amount</th></tr>
+    <tr th:each="t : ${top}">
+      <td th:text="${t.emoji + ' ' + t.name}">Item</td>
+      <td class="num" th:text="${t.qty_sold}">0</td>
+      <td class="num" th:text="'₹' + ${#numbers.formatDecimal(t.amount, 1, 2)}">0</td>
+    </tr>
+  </table></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Order status')}"></head>
+<body>
+<nav th:replace="~{fragments :: nav}"></nav>
+<main class="wrap">
+  <h1>Your order</h1>
+  <div th:replace="~{fragments :: flash}"></div>
+
+  <div class="ticket">
+    <div class="stub"><small>Your token</small><strong th:text="${order.token_code}">T-001</strong></div>
+    <div class="info">
+      <div>Pickup at <b th:text="${order.pickup}">12:30</b></div>
+      <div>Placed <span th:text="${order.placed_at}">today</span></div>
+      <div>Payment: <span th:text="${order.payment_mode + ' (' + order.pay_status.toLowerCase() + ')'}">UPI</span></div>
+      <div>Total: <b th:text="'₹' + ${#numbers.formatDecimal(order.total, 1, 2)}">₹100.00</b></div>
+    </div>
+  </div>
+
+  <div th:if="${order.status == 'CANCELLED'}" class="alert err">This order was cancelled.</div>
+  <ol class="steps" th:unless="${order.status == 'CANCELLED'}">
+    <li th:each="lbl, st : ${steps}" th:text="${lbl}"
+        th:classappend="${(stepIdx >= st.index ? 'done ' : '') + (stepIdx == st.index ? 'current' : '')}">Placed</li>
+  </ol>
+  <p th:if="${order.status == 'READY'}" class="alert ok">Your food is ready. Show your token at the counter.</p>
+  <p th:if="${active}" class="muted">This page refreshes by itself every few seconds.</p>
+
+  <div class="scroll"><table>
+    <tr><th>Item</th><th class="num">Qty</th><th class="num">Price</th><th class="num">Total</th></tr>
+    <tr th:each="i : ${items}">
+      <td th:text="${i.emoji + ' ' + i.name}">Item</td>
+      <td class="num" th:text="${i.quantity}">1</td>
+      <td class="num" th:text="'₹' + ${#numbers.formatDecimal(i.unit_price, 1, 2)}">₹0</td>
+      <td class="num" th:text="'₹' + ${#numbers.formatDecimal(i.line_total, 1, 2)}">₹0</td>
+    </tr>
+  </table></div>
+  <p>
+    <a class="btn" th:href="@{/bill/{id}(id=${order.order_id})}">View bill</a>
+    <a class="btn alt" th:href="@{/orders}">All my orders</a>
+  </p>
+  <form th:if="${order.status == 'PLACED' and !session.user.admin}" method="post" th:action="@{/order/{id}/cancel(id=${order.order_id})}">
+    <button class="danger small" type="submit">Cancel this order</button>
+  </form>
+  <script th:if="${active}">setTimeout(function(){ location.reload(); }, 8000);</script>
+</main>
+</body>
+</html>
